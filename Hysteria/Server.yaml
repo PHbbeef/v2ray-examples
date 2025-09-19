@@ -1,0 +1,17 @@
+listen: :443
+
+acme:
+  domains:
+    - v4hk.drlihui.eu.org
+    - v6hk.drlihui.eu.org 
+  email: tconcave9@gmail.com
+
+auth:
+  type: password
+  password: Hui20050211 
+
+masquerade: 
+  type: proxy
+  proxy:
+    url: https://bilibili.com/ 
+    rewriteHost: true
