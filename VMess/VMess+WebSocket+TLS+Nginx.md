@@ -36,7 +36,7 @@
 
 
 ## Nginx 配置
-```json
+```conf
 server {
   listen  443 ssl;
   ssl on;
@@ -58,6 +58,25 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 }
+```
+```c++
+// 由于 WebSocket 使用 HTTP/1.1，因此 Nginx 访问后端的 V2Ray 服务器时需要使用 HTTP/1.1 协议。添加如下设置：
+proxy_http_version 1.1;
+
+// 立 WebSocket 连接时，客户端会请求将连接升级为 WebSocket，因此还需要使 Nginx 与后端服务器建立 WebSocket 连接。在此需要设置 Nginx 访问 V2Ray 服务器时的请求头，添加如下设置：
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection "upgrade";
+
+// 同时为了防止长时间没有数据发送导致 Nginx 切断连接，这里还可以设置超时时间：
+proxy_read_timeout 600s;
+
+// 由于是 Nginx 访问后端服务器，因此后端服务器并不知道客户端的真实 IP 地址。如果想要让后端服务器知道客户端的 IP 地址，同样需要设置请求头。添加如下设置：
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+// 当通过不正确的方式访问 WebSocket 的路径时，后端服务器会响应 400 Bad Request。这对 GFW 来讲是一种可能可以被探测到的特征，因此可以设置 Nginx 捕获后端服务器的 400 Bad Request 响应，并跳转到其它位置。这里以跳转到主页为例，添加如下设置：
+proxy_intercept_errors on;
+error_page 400 = https://name.yourdomain/;
 ```
 
 
