@@ -47,7 +47,7 @@ server {
   server_name           mydomain.me;
         location /ray { # 与 V2Ray 配置中的 path 保持一致
         proxy_redirect off;
-        proxy_pass http://127.0.0.1:10000;#假设WebSocket监听在环回地址的10000端口上
+        proxy_pass http://127.0.0.1:10000/;#假设WebSocket监听在环回地址的10000端口上
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -63,7 +63,7 @@ server {
 // 由于 WebSocket 使用 HTTP/1.1，因此 Nginx 访问后端的 V2Ray 服务器时需要使用 HTTP/1.1 协议。添加如下设置：
 proxy_http_version 1.1;
 
-// 立 WebSocket 连接时，客户端会请求将连接升级为 WebSocket，因此还需要使 Nginx 与后端服务器建立 WebSocket 连接。在此需要设置 Nginx 访问 V2Ray 服务器时的请求头，添加如下设置：
+// 当 WebSocket 连接时，客户端会请求将连接升级为 WebSocket，因此还需要使 Nginx 与后端服务器建立 WebSocket 连接。在此需要设置 Nginx 访问 V2Ray 服务器时的请求头，添加如下设置：
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection "upgrade";
 
